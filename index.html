@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt 探險家｜我會問 AI！</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFF8EE;
+    --pink:#FF8FA8;
+    --pink-deep:#FF6B93;
+    --sky:#5EC4E8;
+    --sky-deep:#3AAAD1;
+    --yellow:#FFC94D;
+    --yellow-deep:#E8A800;
+    --green:#66C08B;
+    --green-deep:#4CAA72;
+    --purple:#B99CE8;
+    --purple-deep:#9A72D6;
+    --ink:#2E2A3B;
+    --ink-soft:#6E6885;
+    --card:#FFFFFF;
+    --shadow: 0 10px 0 rgba(46,42,59,0.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 12% 15%, #FFEFD1 0%, transparent 45%),
+      radial-gradient(circle at 88% 20%, #D8F3FF 0%, transparent 40%),
+      radial-gradient(circle at 20% 90%, #FFE1EB 0%, transparent 45%),
+      var(--cream);
+    font-family:'Nunito', sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:24px 14px 60px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .stage{width:100%; max-width:560px;}
+
+  header{text-align:center; margin-bottom:14px;}
+  .brand{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--card); padding:8px 18px 8px 10px; border-radius:999px;
+    box-shadow:var(--shadow); border:3px solid var(--ink);
+  }
+  .brand .badge{
+    width:34px;height:34px;border-radius:50%; background:var(--purple);
+    display:flex;align-items:center;justify-content:center; font-size:18px; border:3px solid var(--ink);
+  }
+  .brand span{font-family:'Baloo 2', sans-serif; font-weight:800; font-size:16px;}
+  h1{font-family:'Baloo 2', sans-serif; font-size:clamp(22px,6vw,30px); margin:14px 0 4px; font-weight:800; text-align:center;}
+  .subtitle{color:var(--ink-soft); font-size:14px; font-weight:600; text-align:center;}
+
+  .mascot-row{display:flex; justify-content:center; margin:16px 0 6px;}
+  #mascot{width:84px;height:84px; transition:transform .35s cubic-bezier(.68,-0.4,.27,1.55);}
+  .bubble{
+    max-width:400px; margin:0 auto 4px; background:var(--card); border:3px solid var(--ink);
+    border-radius:18px; padding:10px 16px; font-weight:700; font-size:13.5px; text-align:center;
+    min-height:20px; box-shadow:var(--shadow);
+  }
+
+  .panel{
+    background:var(--card); border:4px solid var(--ink); border-radius:26px;
+    padding:22px 20px; margin-top:16px; box-shadow:var(--shadow);
+  }
+  .hidden{display:none !important;}
+
+  /* Intro */
+  .formula-row{
+    display:flex; justify-content:center; align-items:center; gap:6px; flex-wrap:wrap;
+    margin:14px 0 18px;
+  }
+  .formula-chip{
+    font-family:'Baloo 2', sans-serif; font-weight:800; font-size:12.5px;
+    padding:7px 12px; border-radius:12px; border:3px solid var(--ink); color:#fff;
+  }
+  .formula-chip.role{background:var(--pink-deep);}
+  .formula-chip.task{background:var(--sky-deep);}
+  .formula-chip.audience{background:var(--yellow-deep);}
+  .formula-chip.condition{background:var(--green-deep);}
+  .formula-chip.format{background:var(--purple-deep);}
+  .plus{font-weight:800; color:var(--ink-soft);}
+
+  .compare-box{
+    display:flex; flex-direction:column; gap:10px; margin:14px 0;
+  }
+  .compare-item{
+    border:3px solid var(--ink); border-radius:16px; padding:12px 14px; font-size:13px; font-weight:600;
+  }
+  .compare-item.bad{background:#FFEAEA;}
+  .compare-item.good{background:#EAFBF1;}
+  .compare-item .lbl{font-family:'Baloo 2', sans-serif; font-weight:800; font-size:13px; display:block; margin-bottom:4px;}
+
+  .why-ai-box{
+    margin-top:16px; background:var(--cream); border:3px dashed var(--ink); border-radius:16px;
+    padding:12px 14px; font-size:12.5px; font-weight:600; color:var(--ink-soft); line-height:1.6;
+  }
+  .why-ai-box b{color:var(--ink);}
+
+  .cta-btn{
+    display:block; margin:20px auto 0; font-family:'Baloo 2', sans-serif; font-weight:800;
+    font-size:16px; background:var(--yellow); border:4px solid var(--ink); border-radius:18px;
+    padding:14px 32px; cursor:pointer; box-shadow:0 6px 0 rgba(46,42,59,0.18);
+    transition:transform .08s ease, box-shadow .08s ease;
+  }
+  .cta-btn:active{transform:translateY(4px); box-shadow:0 2px 0 rgba(46,42,59,0.18);}
+  .cta-btn:disabled{opacity:.4; cursor:default;}
+  .cta-btn.small{font-size:13px; padding:10px 20px; margin:14px auto 0;}
+
+  /* Diagnosis phase */
+  .diag-prompt{
+    text-align:center; font-family:'Baloo 2', sans-serif; font-weight:700; font-size:16px;
+    background:#FFEAEA; border:3px solid var(--ink); border-radius:16px; padding:14px; margin-bottom:14px;
+  }
+  .check-grid{display:flex; flex-direction:column; gap:8px;}
+  .check-row{
+    display:flex; align-items:center; gap:10px; background:var(--cream); border:3px solid var(--ink);
+    border-radius:14px; padding:10px 14px; cursor:pointer; font-weight:700; font-size:13.5px;
+  }
+  .check-row .box{
+    width:22px;height:22px;border-radius:6px; border:3px solid var(--ink); background:#fff; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:13px;
+  }
+  .check-row.checked .box{background:var(--green);}
+  .diag-feedback{
+    margin-top:14px; font-size:12.5px; font-weight:600; color:var(--ink-soft); text-align:center; line-height:1.6;
+  }
+
+  /* progress */
+  .progress{display:flex; justify-content:center; gap:6px; margin:14px 0 0; flex-wrap:wrap;}
+  .dot{width:11px;height:11px;border-radius:50%; background:#EDE7F5; border:2px solid var(--ink); transition:transform .2s ease;}
+  .dot.done{background:var(--purple);}
+  .dot.current{transform:scale(1.35);}
+
+  /* Builder */
+  .topic-banner{
+    text-align:center; margin-bottom:10px;
+  }
+  .topic-banner .emoji{font-size:44px;}
+  .topic-banner .name{font-family:'Baloo 2', sans-serif; font-weight:800; font-size:18px;}
+
+  .preview-box{
+    background:var(--cream); border:3px solid var(--ink); border-radius:16px; padding:12px 14px;
+    font-size:13.5px; font-weight:700; line-height:1.7; min-height:70px; margin-bottom:16px;
+  }
+  .preview-box .blank{color:#C7C1D6;}
+  .preview-box .filled.role{color:var(--pink-deep);}
+  .preview-box .filled.task{color:var(--sky-deep);}
+  .preview-box .filled.audience{color:var(--yellow-deep);}
+  .preview-box .filled.condition{color:var(--green-deep);}
+  .preview-box .filled.format{color:var(--purple-deep);}
+
+  .stars{text-align:center; font-size:20px; letter-spacing:3px; margin-bottom:14px;}
+
+  .cat-block{margin-bottom:14px;}
+  .cat-title{
+    font-family:'Baloo 2', sans-serif; font-weight:800; font-size:13px; margin-bottom:6px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .cat-title .swatch{width:12px;height:12px;border-radius:4px; border:2px solid var(--ink);}
+  .chip-row{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{
+    font-size:12.5px; font-weight:700; padding:8px 12px; border-radius:12px; border:3px solid var(--ink);
+    background:#fff; cursor:pointer; transition:transform .08s ease;
+  }
+  .chip:active{transform:scale(0.96);}
+  .chip.selected.role{background:var(--pink); }
+  .chip.selected.task{background:var(--sky);}
+  .chip.selected.audience{background:var(--yellow);}
+  .chip.selected.condition{background:var(--green);}
+  .chip.selected.format{background:var(--purple);}
+
+  /* gallery */
+  .gallery-grid{
+    display:grid; grid-template-columns:1fr; gap:14px; margin-top:10px;
+  }
+  @media (min-width:460px){ .gallery-grid{grid-template-columns:1fr 1fr;} }
+  .prompt-card{
+    border:4px solid var(--ink); border-radius:20px; padding:14px; background:linear-gradient(160deg,#fff, var(--cream));
+    box-shadow:0 8px 0 rgba(46,42,59,0.12);
+  }
+  .prompt-card .pc-head{display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+  .prompt-card .pc-head .emoji{font-size:26px;}
+  .prompt-card .pc-head .name{font-family:'Baloo 2', sans-serif; font-weight:800; font-size:14px;}
+  .prompt-card .pc-text{font-size:12px; font-weight:600; line-height:1.6; margin-bottom:8px;}
+  .pc-tags{display:flex; flex-wrap:wrap; gap:4px;}
+  .pc-tag{font-size:9.5px; font-weight:800; padding:3px 7px; border-radius:999px; color:#fff;}
+  .pc-tag.role{background:var(--pink-deep);}
+  .pc-tag.task{background:var(--sky-deep);}
+  .pc-tag.audience{background:var(--yellow-deep);}
+  .pc-tag.condition{background:var(--green-deep);}
+  .pc-tag.format{background:var(--purple-deep);}
+
+  .end-title{text-align:center; font-family:'Baloo 2', sans-serif; font-weight:800; font-size:20px; margin-bottom:4px;}
+  .end-sub{text-align:center; color:var(--ink-soft); font-weight:600; font-size:13px; margin-bottom:6px;}
+
+  footer{text-align:center; margin-top:26px; font-size:12px; color:var(--ink-soft); font-weight:600;}
+
+  @media print{
+    body{padding:0; background:#fff;}
+    header, .mascot-row, .bubble, footer, #btn-print, #btn-restart-gallery{display:none !important;}
+  }
+
+  @media (prefers-reduced-motion: reduce){*{transition:none !important; animation:none !important;}}
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <header>
+    <div class="brand">
+      <div class="badge">🪄</div>
+      <span>Prompt 探險家</span>
+    </div>
+    <h1>我會問 AI！</h1>
+    <div class="subtitle">問得好，AI 才答得好</div>
+  </header>
+
+  <div class="mascot-row">
+    <svg id="mascot" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="90" rx="26" ry="6" fill="#00000012"/>
+      <rect x="30" y="34" width="40" height="34" rx="12" fill="#FFC94D" stroke="#2E2A3B" stroke-width="4"/>
+      <circle cx="50" cy="20" r="18" fill="#FFFFFF" stroke="#2E2A3B" stroke-width="4"/>
+      <circle cx="43" cy="19" r="3.4" fill="#2E2A3B" id="eyeL"/>
+      <circle cx="57" cy="19" r="3.4" fill="#2E2A3B" id="eyeR"/>
+      <path d="M43 27 Q50 32 57 27" stroke="#2E2A3B" stroke-width="3" fill="none" stroke-linecap="round" id="mouth"/>
+      <rect x="47" y="2" width="6" height="10" rx="3" fill="#2E2A3B"/>
+      <circle cx="50" cy="3" r="4" fill="#FF6B93" stroke="#2E2A3B" stroke-width="2.5"/>
+      <rect x="16" y="42" width="14" height="9" rx="4" fill="#5EC4E8" stroke="#2E2A3B" stroke-width="3.5"/>
+      <rect x="70" y="42" width="14" height="9" rx="4" fill="#5EC4E8" stroke="#2E2A3B" stroke-width="3.5"/>
+    </svg>
+  </div>
+  <div class="bubble" id="bubble">歡迎來到 Prompt 探險家！我們來學怎麼問 AI 問題吧 ✨</div>
+
+  <!-- PHASE 0: INTRO -->
+  <div class="panel" id="phase-intro">
+    <div class="formula-row">
+      <div class="formula-chip role">角色</div><span class="plus">+</span>
+      <div class="formula-chip task">任務</div><span class="plus">+</span>
+      <div class="formula-chip audience">對象</div><span class="plus">+</span>
+      <div class="formula-chip condition">條件</div><span class="plus">+</span>
+      <div class="formula-chip format">格式</div>
+    </div>
+    <div class="compare-box">
+      <div class="compare-item bad"><span class="lbl">❌ 模糊的問法</span>Tell me about space.</div>
+      <div class="compare-item good"><span class="lbl">⭕ 清楚的問法</span>You are a space teacher. Explain black holes to a 10-year-old using a simple story and three examples.</div>
+    </div>
+    <div class="why-ai-box">
+      💡 <b>為什麼這跟 AI 有關？</b><br>
+      AI（像 ChatGPT）是從大量資料中學會「看到什麼樣的問題，就給出什麼樣的回答」。問題越模糊，AI 能參考的線索就越少，只好給一個很籠統的答案；問題裡有角色、任務、對象、條件、格式這些線索，AI 就能抓到更準確的方向，回答也會更符合你的需要。
+    </div>
+    <button class="cta-btn" id="btn-start">🚀 開始挑戰</button>
+  </div>
+
+  <!-- PHASE 1: DIAGNOSIS -->
+  <div class="panel hidden" id="phase-diag">
+    <div style="font-family:'Baloo 2',sans-serif; font-weight:800; font-size:15px; text-align:center; margin-bottom:8px;">
+      🔍 找找看，這個 Prompt 少了什麼？
+    </div>
+    <div class="diag-prompt">「幫我介紹恐龍。」</div>
+    <div class="check-grid" id="check-grid"></div>
+    <div class="diag-feedback" id="diag-feedback"></div>
+    <button class="cta-btn" id="btn-diag-check">✅ 檢查看看</button>
+    <button class="cta-btn hidden" id="btn-to-builder">👉 換我來改寫 Prompt！</button>
+  </div>
+
+  <!-- PHASE 2: BUILDER -->
+  <div class="panel hidden" id="phase-builder">
+    <div class="progress" id="progress"></div>
+    <div class="topic-banner">
+      <div class="emoji" id="topic-emoji">🦕</div>
+      <div class="name" id="topic-name">恐龍</div>
+    </div>
+    <div class="stars" id="stars">☆☆☆☆☆</div>
+    <div class="preview-box" id="preview-box"></div>
+
+    <div class="cat-block">
+      <div class="cat-title"><span class="swatch" style="background:var(--pink-deep)"></span>角色 — AI 要扮演誰？</div>
+      <div class="chip-row" id="chips-role"></div>
+    </div>
+    <div class="cat-block">
+      <div class="cat-title"><span class="swatch" style="background:var(--sky-deep)"></span>任務 — 要做什麼事？</div>
+      <div class="chip-row" id="chips-task"></div>
+    </div>
+    <div class="cat-block">
+      <div class="cat-title"><span class="swatch" style="background:var(--yellow-deep)"></span>對象 — 說給誰聽？</div>
+      <div class="chip-row" id="chips-audience"></div>
+    </div>
+    <div class="cat-block">
+      <div class="cat-title"><span class="swatch" style="background:var(--green-deep)"></span>條件 — 有什麼限制？</div>
+      <div class="chip-row" id="chips-condition"></div>
+    </div>
+    <div class="cat-block">
+      <div class="cat-title"><span class="swatch" style="background:var(--purple-deep)"></span>格式 — 用什麼形式呈現？</div>
+      <div class="chip-row" id="chips-format"></div>
+    </div>
+
+    <button class="cta-btn" id="btn-add-card" disabled>🎴 加入我的 Prompt Cards</button>
+  </div>
+
+  <!-- PHASE 3: GALLERY -->
+  <div class="panel hidden" id="phase-gallery">
+    <div class="end-title">🏆 我的 5 張 Prompt Cards</div>
+    <div class="end-sub">恭喜完成！每一張都用了角色＋任務＋對象＋條件＋格式，比原本模糊的問題清楚多了。</div>
+    <div class="gallery-grid" id="gallery-grid"></div>
+    <button class="cta-btn small" id="btn-print">🖨️ 列印 / 分享我的卡片</button>
+    <button class="cta-btn small" id="btn-restart-gallery">🔁 重新開始</button>
+  </div>
+
+  <footer>小提醒：好的 Prompt 不是「講更多字」，而是「講更清楚」——讓 AI 知道你到底想要什麼。</footer>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const TOPICS = [
+  {emoji:"🦕", name:"恐龍"},
+  {emoji:"🕳️", name:"黑洞"},
+  {emoji:"🐳", name:"海洋動物"},
+  {emoji:"🚀", name:"未來交通工具"},
+  {emoji:"🌈", name:"我夢想中的一天"},
+];
+
+const CATS = ["role","task","audience","condition","format"];
+const CAT_LABEL = {role:"角色", task:"任務", audience:"對象", condition:"條件", format:"格式"};
+
+const POOL = {
+  role: ["你是一位科普老師", "你是一位說故事高手", "你是一位專業研究員", "你是一位妙趣橫生的主持人"],
+  task: ["用簡單的方式解釋{topic}", "說一個關於{topic}的小故事", "整理三個關於{topic}的重點", "用比喻的方式介紹{topic}"],
+  audience: ["給10歲的小朋友聽", "給第一次認識這個主題的人", "給幼兒園小朋友聽", "給想要考100分的學生聽"],
+  condition: ["內容要少於100字", "要包含一個生活中的例子", "語氣要活潑有趣", "不可以使用太難的專有名詞"],
+  format: ["用條列式呈現", "用故事的方式呈現", "用問答的方式呈現", "搭配一個表格呈現"],
+};
+
+function setMascot(state){
+  const mouth = $('mouth'), mascot = $('mascot');
+  if(state==='happy'){ mouth.setAttribute('d','M43 26 Q50 34 57 26'); mascot.style.transform='rotate(-6deg) scale(1.06)'; }
+  else if(state==='oops'){ mouth.setAttribute('d','M43 30 Q50 24 57 30'); mascot.style.transform='rotate(6deg) scale(0.96)'; }
+  else { mouth.setAttribute('d','M43 27 Q50 32 57 27'); mascot.style.transform='rotate(0deg) scale(1)'; }
+}
+
+function showPhase(id){
+  ['phase-intro','phase-diag','phase-builder','phase-gallery'].forEach(p=>{
+    $(p).classList.toggle('hidden', p!==id);
+  });
+}
+
+// ---- PHASE 0 -> 1 ----
+$('btn-start').addEventListener('click', ()=>{
+  showPhase('phase-diag');
+  $('bubble').textContent = '這個 Prompt 太模糊了，幫我找出它少了哪些要素吧！';
+  buildDiagChecklist();
+});
+
+function buildDiagChecklist(){
+  const grid = $('check-grid');
+  grid.innerHTML = '';
+  CATS.forEach(cat=>{
+    const row = document.createElement('div');
+    row.className = 'check-row';
+    row.dataset.cat = cat;
+    row.innerHTML = `<span class="box"></span><span>少了「${CAT_LABEL[cat]}」</span>`;
+    row.addEventListener('click', ()=>{
+      row.classList.toggle('checked');
+      row.querySelector('.box').textContent = row.classList.contains('checked') ? '✓' : '';
+    });
+    grid.appendChild(row);
+  });
+  $('diag-feedback').textContent = '';
+  $('btn-diag-check').classList.remove('hidden');
+  $('btn-to-builder').classList.add('hidden');
+}
+
+$('btn-diag-check').addEventListener('click', ()=>{
+  const checked = document.querySelectorAll('.check-row.checked').length;
+  setMascot(checked>=4 ? 'happy' : 'oops');
+  $('diag-feedback').textContent = checked >= 4
+    ? '答對了！「幫我介紹恐龍」幾乎五個要素都沒有，所以 AI 只能給一個很籠統的答案。現在換你來改寫它！'
+    : `你選了 ${checked} 個，其實這句話五個要素都沒寫清楚喔！沒關係，我們直接來練習怎麼補上這些要素吧！`;
+  $('btn-diag-check').classList.add('hidden');
+  $('btn-to-builder').classList.remove('hidden');
+});
+
+$('btn-to-builder').addEventListener('click', ()=>{
+  showPhase('phase-builder');
+  buildProgress();
+  loadTopic();
+});
+
+// ---- PHASE 2: BUILDER ----
+let topicIdx = 0;
+let selections = {}; // cat -> chosen string (template)
+let cards = [];
+
+function buildProgress(){
+  const el = $('progress');
+  el.innerHTML = '';
+  TOPICS.forEach((_, i)=>{
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.id = 'dot-'+i;
+    el.appendChild(d);
+  });
+}
+
+function updateProgress(){
+  TOPICS.forEach((_, i)=>{
+    const d = $('dot-'+i);
+    d.classList.toggle('current', i===topicIdx);
+    d.classList.toggle('done', i < topicIdx);
+  });
+}
+
+function loadTopic(){
+  if(topicIdx >= TOPICS.length){
+    showGallery();
+    return;
+  }
+  selections = {};
+  const topic = TOPICS[topicIdx];
+  $('topic-emoji').textContent = topic.emoji;
+  $('topic-name').textContent = topic.name;
+  $('bubble').textContent = `幫「${topic.name}」這個主題，從每一排選一個，組出一句完整的 Prompt！`;
+  setMascot('neutral');
+  updateProgress();
+  renderChips(topic);
+  updatePreview();
+}
+
+function renderChips(topic){
+  CATS.forEach(cat=>{
+    const row = $('chips-'+cat);
+    row.innerHTML = '';
+    POOL[cat].forEach(optTemplate=>{
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      const text = optTemplate.replace('{topic}', topic.name);
+      chip.textContent = text;
+      chip.addEventListener('click', ()=>{
+        selections[cat] = text;
+        row.querySelectorAll('.chip').forEach(c=>c.classList.remove('selected', cat));
+        chip.classList.add('selected', cat);
+        updatePreview();
+      });
+      row.appendChild(chip);
+    });
+  });
+}
+
+function updatePreview(){
+  const filledCount = CATS.filter(c=>selections[c]).length;
+  const stars = '★'.repeat(filledCount) + '☆'.repeat(5-filledCount);
+  $('stars').textContent = stars;
+
+  const role = selections.role, task = selections.task, audience = selections.audience,
+        condition = selections.condition, format = selections.format;
+
+  const box = $('preview-box');
+  box.innerHTML =
+    span(role, 'role', '角色') + '，請' +
+    span(task, 'task', '任務') + '，' +
+    span(audience, 'audience', '對象') + '。' +
+    span(condition, 'condition', '條件') + '，並' +
+    span(format, 'format', '格式') + '。';
+
+  $('btn-add-card').disabled = filledCount < 5;
+  if(filledCount === 5){
+    setMascot('happy');
+  }
+}
+
+function span(value, cls, placeholder){
+  if(value) return `<span class="filled ${cls}">${value}</span>`;
+  return `<span class="blank">[${placeholder}]</span>`;
+}
+
+$('btn-add-card').addEventListener('click', ()=>{
+  const topic = TOPICS[topicIdx];
+  const sentence = `${selections.role}，請${selections.task}，${selections.audience}。${selections.condition}，並${selections.format}。`;
+  cards.push({
+    topic: topic.name,
+    emoji: topic.emoji,
+    sentence,
+    tags: CATS.map(c=>({cat:c, label:CAT_LABEL[c], value:selections[c]}))
+  });
+  topicIdx++;
+  loadTopic();
+});
+
+// ---- PHASE 3: GALLERY ----
+function showGallery(){
+  showPhase('phase-gallery');
+  $('bubble').textContent = '太棒了！你已經是 Prompt 高手了 🎉';
+  setMascot('happy');
+  const grid = $('gallery-grid');
+  grid.innerHTML = '';
+  cards.forEach(card=>{
+    const el = document.createElement('div');
+    el.className = 'prompt-card';
+    const tagsHtml = card.tags.map(t=>`<span class="pc-tag ${t.cat}">${t.label}</span>`).join('');
+    el.innerHTML = `
+      <div class="pc-head"><span class="emoji">${card.emoji}</span><span class="name">${card.topic}</span></div>
+      <div class="pc-text">${card.sentence}</div>
+      <div class="pc-tags">${tagsHtml}</div>
+    `;
+    grid.appendChild(el);
+  });
+}
+
+$('btn-print').addEventListener('click', ()=>window.print());
+
+$('btn-restart-gallery').addEventListener('click', ()=>{
+  topicIdx = 0; selections = {}; cards = [];
+  showPhase('phase-intro');
+  $('bubble').textContent = '歡迎來到 Prompt 探險家！我們來學怎麼問 AI 問題吧 ✨';
+  setMascot('neutral');
+});
+</script>
+</body>
+</html>
